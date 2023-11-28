@@ -1,0 +1,31 @@
+from collections import deque
+def is_valid_state(missionaries, cannibals):
+    return 0 <= missionaries <= 3 and 0 <= cannibals <= 3 and (missionaries == 0 or missionaries >= cannibals) and (3 - missionaries == 0 or 3 - missionaries >= 3 - cannibals)
+def solve_missionaries_and_cannibals(start_state, end_state):
+    visited, queue = set(), deque([(start_state, [])])
+    while queue:
+        current_state, path = queue.popleft()
+        if current_state in visited: continue
+        visited.add(current_state)
+        if current_state == end_state:
+            return path + [end_state]
+        missionaries, cannibals, boat_position = current_state
+        for move in possible_moves:
+            new_m, new_c = (missionaries - move[0], cannibals - move[1]) if boat_position == 1 else (missionaries + move[0], cannibals + move[1])
+            new_boat = 1 - boat_position
+            new_state = (new_m, new_c, new_boat)
+            if is_valid_state(new_m, new_c) and new_state not in visited:
+                queue.append((new_state, path + [current_state]))
+    return None
+start_state = (3, 3, 1)
+end_state = (0, 0, 0)
+possible_moves = [(0, 1), (0, 2), (1, 0), (2, 0), (1, 1)]
+solution = solve_missionaries_and_cannibals(start_state, end_state)
+if solution:
+    print("Solution found:")
+    for state in solution:
+        missionaries, cannibals, boat_position = state
+        side = "left" if boat_position == 1 else "right"
+        print(f"({missionaries}, {cannibals}) on {side} bank")
+else:
+    print("No solution found.")
